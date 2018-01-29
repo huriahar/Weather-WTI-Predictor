@@ -30,7 +30,7 @@ def read_AAL_csv(file_name):
     df = pd.read_csv(file_name, na_values=['-'])
     df.drop(['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis = 1, inplace=True)
     df.columns = ['yyyymmdd', 'AAL']
-    formatdate = lambda x: (x[0:4]+x[5:7]+x[8:10])
+    formatdate = lambda x: int(x[0:4]+x[5:7]+x[8:10])
     roundaal = lambda x: round(x, 2) 
     df['yyyymmdd'] = df['yyyymmdd'].map(formatdate)
     df['AAL'] = df['AAL'].map(roundaal)
@@ -61,19 +61,23 @@ if __name__ == "__main__":
     houston_data = read_weather_data("houston_weather.csv")
     dhahran_data = read_weather_data("dhahran_weather.csv")
     omsk_data    = read_weather_data("omsk_weather.csv")
+    elec_consum  = read_weather_data("electricity_consumption.csv")
+    enery_use_kg = read_weather_data("enery_use_kg_oil.csv")
     AAL_data     = read_AAL_csv("AAL.csv") 
     WTI_data     = pd.read_csv("DCOILWTICO.csv")
 
     # STEP 2 - merge CSV files
 
     # Merge the data for three cities and keep the union of the dates
-    merged_weather = pd.merge(houston_data, AAL_data, on='yyyymmdd', how='outer')
-    merged_weather = pd.merge(merged_weather, dhahran_data, on='yyyymmdd', how='outer')
+    merged_weather = pd.merge(houston_data, dhahran_data, on='yyyymmdd', how='outer')
     merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='outer')
+    merged_weather = pd.merge(merged_weather, elec_consum, on='yyyymmdd', how='outer')
+    merged_weather = pd.merge(merged_weather, enery_use_kg, on='yyyymmdd', how='outer')
+    merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='outer')
 
-    with open('aaldata.csv', 'a') as f:
+    with open('aaldata.csv', 'w') as f:
         AAL_data.to_csv(f, line_terminator='\n', index=False, header=True)
-    with open('filelocation.csv', 'a') as f:
+    with open('filelocation.csv', 'w') as f:
         merged_weather.to_csv(f, line_terminator='\n', index=False, header=True)
 
     # Dhahran's temperature, pressure, humidity has 36 NaNs

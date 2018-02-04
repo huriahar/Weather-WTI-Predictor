@@ -46,9 +46,9 @@ def call_ml(f, p, d):
     os.system('python infra.py -f {} -p {} -d {}'.format(f, p, d))
 
 def testParams():
-    fValues = [1, 3, 7]#, 14, 21, 30]
-    pValues = [1, 7]#, 14, 21, 30, 60, 90, 120, 150, 180, 210, 270, 300, 365]
-    yValues = [2008, 2009]#, 2010, 2011, 2012, 2013, 2014, 2015, 2016]
+    fValues = [7, 8, 9, 10]#, 14, 21, 30]
+    pValues = [7, 8, 9, 10, 14] #, 7]#, 14, 21, 30, 60, 90, 120, 150, 180, 210, 270, 300, 365]
+    yValues = [2009, 2010] #, 2011, 2012, 2013, 2014, 2015, 2016]
     for f in fValues:
         for p in pValues:
             for y in yValues:

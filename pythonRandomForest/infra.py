@@ -53,33 +53,58 @@ def read_args():
     print(past_days, date, future_days)
     return future_days, date, past_days
 
+def read_world_bank_data_csv(filename, countries):
+    min_year = 2007
+    max_year = 2017
+    df = pd.read_csv(filename, na_values=['-'])
+    # filter by country code
+    df = df.loc[df['Country Code'].isin(countries)]
+    # filter rows
+    df.drop(df.ix[:, 'Indicator Name':'2006'], axis=1, inplace=True)
+    #df.filter(items=['2007':'2017'])
+    return df
+
+def read_gold_data_csv(filename):
+    df = pd.read_csv(filename)
+    #df.drop(df.index[[0,1,2]], axis=0, inplace=True)
+    df.drop(df.ix[:,'USD0':'JPY3'], axis=1, inplace=True)
+    df.drop(df.ix[:,'USD5':], axis=1, inplace=True)
+    df.columns = ['yyyymmdd', 'gold']
+    #pu.db
+    formatdate = lambda x: int("20"+x[6:8] + x[3:5] + x[0:2])
+    df['yyyymmdd'] = df['yyyymmdd'].map(formatdate)
+    return df
 
 if __name__ == "__main__":
     future_days, date, past_days = read_args()
+    # countries_list = ["USA", "IND", "CHN", "EUU"]
 
     # STEP 1 - Read input CSVs
+
     houston_data = read_weather_data("houston_weather.csv")
     dhahran_data = read_weather_data("dhahran_weather.csv")
     omsk_data    = read_weather_data("omsk_weather.csv")
-    elec_consum  = read_weather_data("electricity_consumption.csv")
-    enery_use_kg = read_weather_data("enery_use_kg_oil.csv")
     AAL_data     = read_AAL_csv("AAL.csv") 
     WTI_data     = pd.read_csv("DCOILWTICO.csv")
+
+    #gold_data1   = read_gold_data_csv("gold_current.csv")
+    #gold_data2   = read_gold_data_csv("gold_previous.csv")
+    #gold_data    = gold_data1.append(gold_data2)
+
 
     # STEP 2 - merge CSV files
 
     # Merge the data for three cities and keep the union of the dates
     merged_weather = pd.merge(houston_data, dhahran_data, on='yyyymmdd', how='outer')
     merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='outer')
-    merged_weather = pd.merge(merged_weather, elec_consum, on='yyyymmdd', how='outer')
-    merged_weather = pd.merge(merged_weather, enery_use_kg, on='yyyymmdd', how='outer')
+    #merged_weather = pd.merge(merged_weather, gold_data, on='yyyymmdd', how='outer')
     merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='outer')
 
-    with open('aaldata.csv', 'w') as f:
-        AAL_data.to_csv(f, line_terminator='\n', index=False, header=True)
+    #with open('golddata.csv', 'w') as f:
+    #    gold_data.to_csv(f, line_terminator='\n', index=False, header=True)
     with open('filelocation.csv', 'w') as f:
         merged_weather.to_csv(f, line_terminator='\n', index=False, header=True)
-
+    #exit(1)
     # Dhahran's temperature, pressure, humidity has 36 NaNs
     # Replace NaN with mean
     merged_weather.fillna(merged_weather.mean()['houston_temperature':'omsk_precipitation'], inplace=True)

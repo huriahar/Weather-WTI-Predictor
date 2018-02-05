@@ -85,6 +85,7 @@ if __name__ == "__main__":
     #test.plot(x='idx', y='wti', style='o')
     #test.plot(y='predicted_wti', use_index=True)
 
+    test['idx'] = test['idx'][:-200]
 
     pl.scatter(test['idx'], test['wti'])
     pl.scatter(test['idx'], test['predicted_wti'])

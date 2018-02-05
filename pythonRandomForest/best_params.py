@@ -10,20 +10,24 @@ MIN_YEAR = 2007
 MAX_YEAR = 2017
 ################################################
 
-# def get_date_range():
-#     start_date = datetime.date( year = MIN_YEAR, month = 1, day = 1 )
-#     end_date = datetime.date( year = MAX_YEAR, month = 12, day = 1 )
-#      
-#     dlist = []
-#      
-#     if start_date &lt;= end_date:
-#         for n in range( ( end_date - start_date ).days + 1 ):
-#     	dlist.append( start_date + datetime.timedelta( n ) )
-#     else:
-#         for n in range( ( start_date - end_date ).days + 1 ):
-#     	dlist.append( start_date - datetime.timedelta( n ) )
-#     return dlist
-# 
+def get_date_range(start_year, end_year, jump):
+    start_date = datetime.date( year = start_year, month = 1, day = 1 )
+    end_date = datetime.date( year = end_year, month = 12, day = 30 )
+     
+    dlist = []
+    i = 0 
+    if start_date <= end_date:
+        for n in range( ( end_date - start_date ).days + 1 ):
+            if i % jump == 0:
+                dlist.append( start_date + datetime.timedelta( n ) )
+            i = i + 1
+    else:
+        for n in range( ( start_date - end_date ).days + 1 ):
+            if i % jump == 0:
+                dlist.append( start_date - datetime.timedelta( n ) )
+            i = i + 1
+    return dlist
+
 # def linear_search(args):
 #     dlist = get_date_range()	 
 #     for f in range(MIN_F, MAX_F):
@@ -52,8 +56,11 @@ def testParams():
     for f in fValues:
         for p in pValues:
             for y in yValues:
-                date = str(y) + "0101"
-                call_ml(f, p, date)
+                dlist = get_date_range(y, y, 1)
+                for d in dlist:
+         	    date = str(d.year) + str(d.month).zfill(2) + str(d.day).zfill(2)
+                    print "future = {} past = {} date = {}".format(f,p,date)
+                    call_ml(f, p, date)
 
 def main():
     testParams()

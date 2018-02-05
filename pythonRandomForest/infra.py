@@ -9,7 +9,7 @@ import pudb
 def read_weather_data (file_name):    
     if not file_name.endswith('.csv'):
         raise ValueError('Expected a .csv extension, but file name is {}'.format(file_name))
-    df = pd.read_csv(file_name, na_values=['-'])
+    df = pd.read_csv(file_name, na_values=['-', '.'])
     # Extract city name
     city_search = re.search(r'^(\w+)_', file_name)
     city = ""
@@ -27,7 +27,7 @@ def read_weather_data (file_name):
     return df
 
 def read_AAL_csv(file_name):
-    df = pd.read_csv(file_name, na_values=['-'])
+    df = pd.read_csv(file_name, na_values=['-', '.'])
     df.drop(['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis = 1, inplace=True)
     df.columns = ['yyyymmdd', 'AAL']
     formatdate = lambda x: int(x[0:4]+x[5:7]+x[8:10])
@@ -75,8 +75,11 @@ def read_gold_data_csv(filename):
     df['yyyymmdd'] = df['yyyymmdd'].map(formatdate)
     return df
 
-if __name__ == "__main__":
-    future_days, date, past_days = read_args()
+#if __name__ == "__main__":
+def predict_oil_prices(future_days, past_days, date):
+    # read from the command line
+    # future_days, date, past_days = read_args()
+
     # countries_list = ["USA", "IND", "CHN", "EUU"]
 
     # STEP 1 - Read input CSVs
@@ -143,11 +146,12 @@ if __name__ == "__main__":
         start_train_idx = start_test_idx - past_days
     else:
         start_train_idx = 0
-
-    print(start_train_idx, start_test_idx)
     # Time Series split of train and test data 80-20
 
-    train, test = merged_data[start_train_idx:start_test_idx], merged_data[start_test_idx:(len(merged_data)-future_days)]
+    #train, test = merged_data[start_train_idx:start_test_idx], merged_data[start_test_idx:(len(merged_data)-future_days)]
+    end_test_idx = min(len(merged_data), start_test_idx + future_days)
+
+    train, test = merged_data[start_train_idx:start_test_idx], merged_data[start_test_idx:end_test_idx]
     print("Total observations: %d" % (len(merged_data) - future_days))
     print("Training observations: %d" % len(train))
     print("Testing observations: %d" % len(test))
@@ -155,7 +159,8 @@ if __name__ == "__main__":
     train_x, train_y = train.iloc[:,1:-1], train.iloc[:, -1]
     test_x, test_y = test.iloc[:,1:-1], test.iloc[:, -1]
 
-    print train_y
+    test_x.to_csv("test_x.csv", sep=",")
+    
 
     rf = RandomForestRegressor(n_estimators=50)
 
@@ -169,3 +174,4 @@ if __name__ == "__main__":
 
     test['DCOILWTICO'].plot(figsize=(16,12))
     test['PredWTI'].plot(figsize=(16,12))
+    return r2

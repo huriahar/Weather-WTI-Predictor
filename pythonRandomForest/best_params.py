@@ -1,5 +1,7 @@
 import datetime
 import os
+from infra import predict_oil_prices
+import pylab as pl
 
 ######### DEFINE THE SOLUTION SPACE ############
 MIN_F = 1
@@ -11,7 +13,7 @@ MAX_YEAR = 2017
 ################################################
 
 def get_date_range(start_year, end_year, jump):
-    start_date = datetime.date( year = start_year, month = 1, day = 1 )
+    start_date = datetime.date( year = start_year, month = 1, day = 6 )
     end_date = datetime.date( year = end_year, month = 12, day = 30 )
      
     dlist = []
@@ -47,20 +49,45 @@ def get_date_range(start_year, end_year, jump):
 def call_ml(f, p, d):
     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     print('Future = {}, past = {} and start date is {}'.format(f, p, d))
-    os.system('python infra.py -f {} -p {} -d {}'.format(f, p, d))
+    #os.system('python infra.py -f {} -p {} -d {}'.format(f, p, d))
+    return predict_oil_prices(f, p, d)
+
+def plot_params(params):
+    lists = sorted(params.items()) # sorted by key, return a list of tuples
+    date, y = zip(*lists) # unpack a list of pairs into two tuples
+    date = list(map(lambda d: datetime.datetime.strptime(d, '%Y%m%d'), date))
+    #date = list(map(lambda d: int(d), date))
+    pl.cla()
+    pl.clf()
+    pl.close()
+    f, p, acc = zip(*y)
+    acc = list(acc)
+    pl.plot(date, acc, '^g')
+    pl.xlabel('date')
+    pl.ylabel('accuracy')
+    pl.ylim(-20, 10)
+    pl.show()
 
 def testParams():
-    fValues = [7, 8, 9, 10]#, 14, 21, 30]
-    pValues = [7, 8, 9, 10, 14] #, 7]#, 14, 21, 30, 60, 90, 120, 150, 180, 210, 270, 300, 365]
-    yValues = [2009, 2010] #, 2011, 2012, 2013, 2014, 2015, 2016]
+    fValues = [3]#, 5, 7, 9]
+    pValues = [7]#, 21, 30] #, 270, 300, 365]
+    yValues = [2009] #, 2012, 2013, 2014, 2015, 2016]
+    max_rsquared = -99999999
+    params = {}
     for f in fValues:
         for p in pValues:
             for y in yValues:
-                dlist = get_date_range(y, y, 1)
+                dlist = get_date_range(y, y, 30)
                 for d in dlist:
          	    date = str(d.year) + str(d.month).zfill(2) + str(d.day).zfill(2)
                     print "future = {} past = {} date = {}".format(f,p,date)
-                    call_ml(f, p, date)
+                    rsquared = call_ml(f, p, date)
+                    params[date] = [f, p, rsquared] 
+                    if rsquared > max_rsquared:
+                        max_rsquared = rsquared
+                        max_day = date
+    print "MAX rsquared = {} on day {} with params {}".format(max_rsquared, max_day, params[max_day])
+    plot_params(params)
 
 def main():
     testParams()

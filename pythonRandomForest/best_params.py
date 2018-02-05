@@ -54,23 +54,33 @@ def call_ml(f, p, d):
 
 def plot_params(params):
     lists = sorted(params.items()) # sorted by key, return a list of tuples
-    date, y = zip(*lists) # unpack a list of pairs into two tuples
+    datefp, acc = zip(*lists) # unpack a list of pairs into two tuples
+    date, f, p = zip(*datefp)
     date = list(map(lambda d: datetime.datetime.strptime(d, '%Y%m%d'), date))
     #date = list(map(lambda d: int(d), date))
     pl.cla()
     pl.clf()
     pl.close()
-    f, p, acc = zip(*y)
-    acc = list(acc)
-    pl.plot(date, acc, '^g')
-    pl.xlabel('date')
-    pl.ylabel('accuracy')
-    pl.ylim(-20, 10)
+    #f, p, acc = zip(*y)
+    print date
+    print acc
+    #acc = list(acc)
+    #pl.plot(date, acc, '^g')
+    #pl.xlabel('date')
+    #pl.ylabel('accuracy')
+    #pl.ylim(-20, 10)
+
+    fig, ax = pl.subplots()
+    ax.scatter(date, acc)
+
+    for idx, d in enumerate(date):
+        pu.db
+        ax.annotate('({},{},{})'.format(f[idx], p[idx], round(acc[idx],2)), (date[idx], acc[idx]), verticalalignment='bottom')
     pl.show()
 
 def testParams():
-    fValues = [3]#, 5, 7, 9]
-    pValues = [7]#, 21, 30] #, 270, 300, 365]
+    fValues = [7, 14, 21]
+    pValues = [7, 21, 30] #, 270, 300, 365]
     yValues = [2009] #, 2012, 2013, 2014, 2015, 2016]
     max_rsquared = -99999999
     params = {}
@@ -82,11 +92,11 @@ def testParams():
          	    date = str(d.year) + str(d.month).zfill(2) + str(d.day).zfill(2)
                     print "future = {} past = {} date = {}".format(f,p,date)
                     rsquared = call_ml(f, p, date)
-                    params[date] = [f, p, rsquared] 
+                    params[(date, f, p)] = rsquared
                     if rsquared > max_rsquared:
                         max_rsquared = rsquared
-                        max_day = date
-    print "MAX rsquared = {} on day {} with params {}".format(max_rsquared, max_day, params[max_day])
+                        max_params = (date, f, p)
+    print "MAX rsquared = {} with params {}".format(max_rsquared, params[max_params])
     plot_params(params)
 
 def main():

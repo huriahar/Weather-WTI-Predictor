@@ -1,9 +1,16 @@
+import datetime
 import pandas as pd
+import numpy as np
 import re, argparse
 import pylab as pl
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.cross_validation import train_test_split
 import pudb
+
+def date_time_to_str(d):
+    d = str(d.year) + str(d.month).zfill(2) + str(d.day).zfill(2)
+    return d
 
 # Read CSV file: expects the file to have the name format <city_name>_weather.csv
 def read_weather_data (file_name):    
@@ -32,8 +39,10 @@ def read_AAL_csv(file_name):
     df.columns = ['yyyymmdd', 'AAL']
     formatdate = lambda x: int(x[0:4]+x[5:7]+x[8:10])
     roundaal = lambda x: round(x, 2) 
+    
     df['yyyymmdd'] = df['yyyymmdd'].map(formatdate)
     df['AAL'] = df['AAL'].map(roundaal)
+    #df.replace(r'^\s*$', np.NaN, regex=True, inplace=True)
     return df
 
 def read_args():
@@ -75,6 +84,26 @@ def read_gold_data_csv(filename):
     df['yyyymmdd'] = df['yyyymmdd'].map(formatdate)
     return df
 
+def get_date_range(start_year, end_year, jump):
+    start_date = datetime.date( year = start_year, month = 1, day = 1 )
+    end_date = datetime.date( year = end_year, month = 12, day = 31 )
+     
+    dlist = []
+    i = 0 
+    if start_date <= end_date:
+        for n in range( ( end_date - start_date ).days + 1 ):
+            if i % jump == 0:
+                dlist.append( start_date + datetime.timedelta( n ) )
+            i = i + 1
+    else:
+        for n in range( ( start_date - end_date ).days + 1 ):
+            if i % jump == 0:
+                dlist.append( start_date - datetime.timedelta( n ) )
+            i = i + 1
+
+    date_to_str = lambda d: int(date_time_to_str(d))
+    return list(map(date_to_str, dlist))
+
 #if __name__ == "__main__":
 def predict_oil_prices(future_days, past_days, date):
     # read from the command line
@@ -95,75 +124,78 @@ def predict_oil_prices(future_days, past_days, date):
     #gold_data    = gold_data1.append(gold_data2)
 
 
+    #create date range
+    dates_list = get_date_range(2007, 2017, 1)
+    dates_df = pd.DataFrame({'yyyymmdd':dates_list})
+
     # STEP 2 - merge CSV files
 
     # Merge the data for three cities and keep the union of the dates
-    merged_weather = pd.merge(houston_data, dhahran_data, on='yyyymmdd', how='outer')
-    merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='outer')
-    #merged_weather = pd.merge(merged_weather, gold_data, on='yyyymmdd', how='outer')
-    merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='outer')
+    merged_weather = pd.merge(dates_df, houston_data, on='yyyymmdd', how='left')
+    merged_weather = pd.merge(merged_weather, dhahran_data, on='yyyymmdd', how='left')
+    merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='left')
+    #merged_weather = pd.merge(merged_weather, gold_data, on='yyyymmdd', how='left')
+    merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='left')
+
+    # STEP 3 - flatten the data based on past_days
+
+    index_column = []
+    count = 0
+    for i in range(0, len(merged_weather)):
+        if i % past_days == 0:
+            count = count + 1
+        index_column.append(count)
+
+    merged_weather = merged_weather.assign(index=index_column)
+    merged_weather = merged_weather.set_index(['index']).groupby(level=['index'])
+
+    flat_merged = pd.DataFrame()
+    for details, data in merged_weather:
+        data_point = pd.concat([row for i, row in data.iterrows()]).to_frame()
+        data_point.index = ['{}_{}'.format(label, i) for i, label in enumerate(data_point.index)]
+        flat_merged = pd.concat([flat_merged, data_point], axis=1)
+    flat_merged = flat_merged.transpose().reset_index()
+
 
     #with open('golddata.csv', 'w') as f:
     #    gold_data.to_csv(f, line_terminator='\n', index=False, header=True)
-    with open('filelocation.csv', 'w') as f:
-        merged_weather.to_csv(f, line_terminator='\n', index=False, header=True)
-    #exit(1)
-    # Dhahran's temperature, pressure, humidity has 36 NaNs
-    # Replace NaN with mean
-    merged_weather.fillna(merged_weather.mean()['houston_temperature':'omsk_precipitation'], inplace=True)
+    with open('filelocation.csv', 'wb') as f:
+        flat_merged.to_csv(f, line_terminator='\n', index=False, header=True)
 
-    # Merge both dataframes and use only the dates which are available for both weather and WTI
-    # TODO: Find a better way of merging both dataframes and keeping only one column out of DATE or yyyymmdd
-    merged_data = pd.merge(merged_weather, WTI_data, left_on='yyyymmdd', right_on='DATE', how='inner')
-    # print(merged_data.isna().sum())
-    merged_data.drop(['DATE'], axis=1, inplace=True)
+    merged_weather = flat_merged
 
-    merged_data['Date'] = merged_data['yyyymmdd'].apply(lambda x: pd.to_datetime(str(x), format='%Y%m%d'))
-    merged_data.set_index('Date', inplace=True)
-    # merged_data['DCOILWTICO'].plot(figsize=(16,12))
-
-    # merged_data.to_csv('merged_data.csv')
+    # STEP 4 - format WTI prices to merge with the rest
 
     # Next step is to offset so you align how many days you wish to predict into the future with the present day!
-    merged_data.DCOILWTICO = merged_data.DCOILWTICO.shift(-1*future_days)
-    # Last future_days rows contain NaN for DCOILWTICO...
-    # TODO: Figure out what to do with that - Just ignore when splitting train and test
+    full_wti = pd.merge(dates_df, WTI_data, left_on='yyyymmdd', right_on='DATE', how='left')
+    full_wti.DCOILWTICO = full_wti.DCOILWTICO.shift(-1*future_days)
 
-    # Now, if date is supplied, start prediction from the given date. If not, use default separator at 80% of total data
-    # If past is supplied, use only the past number of days before given date for training. If not, use all the data before the "date"
+    # Merge both dataframes and use only the dates which are available for both weather and WTI
+    merged_data = pd.merge(merged_weather, full_wti, left_on='yyyymmdd_0', right_on='yyyymmdd', how='left')
+    merged_data.drop(['DATE', 'yyyymmdd'], axis=1, inplace=True)
+    date_cols_to_drop = []
+    for i in range(1, len(merged_data.columns)):
+        label_to_drop = 'yyyymmdd_{}'.format(i)
+        if i > 0 and label_to_drop in merged_data.columns:
+            date_cols_to_drop.append(label_to_drop)
+    merged_data.drop(date_cols_to_drop, axis=1, inplace=True)
+    # Replace NaN with mean
+    merged_data.fillna(merged_data.mean()['houston_temperature_1':'DCOILWTICO'], inplace=True)
+    merged_data = merged_data.round(2)
+    merged_data = merged_data.stack().apply(pd.to_numeric, errors='ignore').fillna(0).unstack()
+    merged_data.to_csv("merged_data.csv", sep=',')
 
-    # TODO: Add edge case checks!!! Now just assuming that if both date and past is supplied, you have plenty of training data available
-    # This will break if you supply random values! Check!!!
-    if date in merged_data.index:
-        print(merged_data.loc[date, :])
-        print("Location idx:", merged_data.index.get_loc(date))
-        start_test_idx = merged_data.index.get_loc(date)
-    else:
-        start_test_idx = int((len(merged_data) - future_days)*0.8)
+    # STEP # - Split data to train and test data frames
 
-    # TODO: Add error checks for past # being out of bounds
-    if past_days != 0 and (start_test_idx - past_days) >= 0:
-        start_train_idx = start_test_idx - past_days
-    else:
-        start_train_idx = 0
-    # Time Series split of train and test data 80-20
+    train, test = train_test_split(merged_data, test_size=0.2)
 
-    #train, test = merged_data[start_train_idx:start_test_idx], merged_data[start_test_idx:(len(merged_data)-future_days)]
-    end_test_idx = min(len(merged_data), start_test_idx + future_days)
-
-    train, test = merged_data[start_train_idx:start_test_idx], merged_data[start_test_idx:end_test_idx]
-    print("Total observations: %d" % (len(merged_data) - future_days))
     print("Training observations: %d" % len(train))
     print("Testing observations: %d" % len(test))
 
-    train_x, train_y = train.iloc[:,1:-1], train.iloc[:, -1]
-    test_x, test_y = test.iloc[:,1:-1], test.iloc[:, -1]
+    train_x, train_y = train.iloc[:,2:-1], train.iloc[:, -1]
+    test_x, test_y = test.iloc[:,2:-1], test.iloc[:, -1]
 
-    test_x.to_csv("test_x.csv", sep=",")
-    
-
-    rf = RandomForestRegressor(n_estimators=50)
-
+    rf = RandomForestRegressor(n_estimators=100)
     rf.fit(train_x, train_y)
     test['PredWTI'] = rf.predict(test_x)
 
@@ -172,6 +204,8 @@ def predict_oil_prices(future_days, past_days, date):
     r2=r2_score(test_y, test['PredWTI'])
     print("R squared:", r2)
 
+    test.sort_values(by=['yyyymmdd_0'], inplace=True)
     test['DCOILWTICO'].plot(figsize=(16,12))
     test['PredWTI'].plot(figsize=(16,12))
+    #pl.show()
     return r2

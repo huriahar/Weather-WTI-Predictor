@@ -1,7 +1,9 @@
 import datetime
 import os
-from infra import predict_oil_prices
 import pylab as pl
+from infra import date_time_to_str
+from infra import predict_oil_prices
+from infra import get_date_range
 
 ######### DEFINE THE SOLUTION SPACE ############
 MIN_F = 1
@@ -11,24 +13,6 @@ MIN_P = 365
 MIN_YEAR = 2007
 MAX_YEAR = 2017
 ################################################
-
-def get_date_range(start_year, end_year, jump):
-    start_date = datetime.date( year = start_year, month = 1, day = 6 )
-    end_date = datetime.date( year = end_year, month = 12, day = 30 )
-     
-    dlist = []
-    i = 0 
-    if start_date <= end_date:
-        for n in range( ( end_date - start_date ).days + 1 ):
-            if i % jump == 0:
-                dlist.append( start_date + datetime.timedelta( n ) )
-            i = i + 1
-    else:
-        for n in range( ( start_date - end_date ).days + 1 ):
-            if i % jump == 0:
-                dlist.append( start_date - datetime.timedelta( n ) )
-            i = i + 1
-    return dlist
 
 # def linear_search(args):
 #     dlist = get_date_range()	 
@@ -81,21 +65,19 @@ def plot_params(params):
 def testParams():
     fValues = [7, 14, 21]
     pValues = [7, 21, 30] #, 270, 300, 365]
-    yValues = [2009] #, 2012, 2013, 2014, 2015, 2016]
     max_rsquared = -99999999
     params = {}
     for f in fValues:
         for p in pValues:
-            for y in yValues:
-                dlist = get_date_range(y, y, 30)
-                for d in dlist:
-         	    date = str(d.year) + str(d.month).zfill(2) + str(d.day).zfill(2)
-                    print "future = {} past = {} date = {}".format(f,p,date)
-                    rsquared = call_ml(f, p, date)
-                    params[(date, f, p)] = rsquared
-                    if rsquared > max_rsquared:
-                        max_rsquared = rsquared
-                        max_params = (date, f, p)
+            start_date = datetime.date( year = MIN_YEAR, month = 1, day = 1 )
+            date = start_date + datetime.timedelta(days=(p+1))
+            d = date_time_to_str(date)
+            print "future = {} past = {} date = {}".format(f,p,d)
+            rsquared = call_ml(f, p, d)
+            params[(d, f, p)] = rsquared
+            if rsquared > max_rsquared:
+                max_rsquared = rsquared
+                max_params = (d, f, p)
     print "MAX rsquared = {} with params {}".format(max_rsquared, params[max_params])
     plot_params(params)
 

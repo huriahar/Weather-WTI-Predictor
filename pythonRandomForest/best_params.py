@@ -36,7 +36,7 @@ def call_ml(f, p, d):
     #os.system('python infra.py -f {} -p {} -d {}'.format(f, p, d))
     return predict_oil_prices(f, p, d)
 
-def plot_params(params):
+def plot_params(params, test):
     lists = sorted(params.items()) # sorted by key, return a list of tuples
     datefp, acc = zip(*lists) # unpack a list of pairs into two tuples
     date, f, p = zip(*datefp)
@@ -46,8 +46,6 @@ def plot_params(params):
     pl.clf()
     pl.close()
     #f, p, acc = zip(*y)
-    print date
-    print acc
     #acc = list(acc)
     #pl.plot(date, acc, '^g')
     #pl.xlabel('date')
@@ -58,8 +56,13 @@ def plot_params(params):
     ax.scatter(date, acc)
 
     for idx, d in enumerate(date):
-        pu.db
         ax.annotate('({},{},{})'.format(f[idx], p[idx], round(acc[idx],2)), (date[idx], acc[idx]), verticalalignment='bottom')
+    pl.show()
+    pl.cla()
+    pl.clf()
+    pl.close()
+    test['DCOILWTICO'].plot(figsize=(16,12))
+    test['PredWTI'].plot(figsize=(16,12))
     pl.show()
 
 def testParams():
@@ -73,13 +76,15 @@ def testParams():
             date = start_date + datetime.timedelta(days=(p+1))
             d = date_time_to_str(date)
             print "future = {} past = {} date = {}".format(f,p,d)
-            rsquared = call_ml(f, p, d)
+            rsquared, avg, results = call_ml(f, p, d)
             params[(d, f, p)] = rsquared
             if rsquared > max_rsquared:
                 max_rsquared = rsquared
                 max_params = (d, f, p)
-    print "MAX rsquared = {} with params {}".format(max_rsquared, params[max_params])
-    plot_params(params)
+                max_results = results
+                max_avg = avg
+    print "MAX rsquared = {} accuracy = {} with params {}".format(max_rsquared, max_avg, params[max_params])
+    plot_params(params, results)
 
 def main():
     testParams()

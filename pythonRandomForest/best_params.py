@@ -61,14 +61,15 @@ def plot_params(params, test):
     pl.cla()
     pl.clf()
     pl.close()
-    test['DCOILWTICO'].plot(figsize=(16,12))
-    test['PredWTI'].plot(figsize=(16,12))
+    test['DCOILWTICO'].plot(figsize=(16,12), color='b')
+    test['PredWTI'].plot(figsize=(16,12), color='g')
     pl.show()
 
 def testParams():
     fValues = [7, 14, 21]
     pValues = [7, 21, 30] #, 270, 300, 365]
     max_rsquared = -99999999
+    max_avg = 0
     params = {}
     for f in fValues:
         for p in pValues:
@@ -83,7 +84,7 @@ def testParams():
                 max_params = (d, f, p)
                 max_results = results
                 max_avg = avg
-    print "MAX rsquared = {} accuracy = {} with params {}".format(max_rsquared, max_avg, params[max_params])
+    print "MAX rsquared = {} accuracy = {} with params {}".format(max_rsquared, max_avg, max_params)
     plot_params(params, results)
 
 def main():

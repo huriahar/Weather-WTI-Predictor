@@ -6,6 +6,7 @@ import pylab as pl
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.cross_validation import train_test_split
+from economic import get_economic_data
 import pudb
 
 def date_time_to_str(d):
@@ -79,7 +80,6 @@ def read_gold_data_csv(filename):
     df.drop(df.ix[:,'USD0':'JPY3'], axis=1, inplace=True)
     df.drop(df.ix[:,'USD5':], axis=1, inplace=True)
     df.columns = ['yyyymmdd', 'gold']
-    #pu.db
     formatdate = lambda x: int("20"+x[6:8] + x[3:5] + x[0:2])
     df['yyyymmdd'] = df['yyyymmdd'].map(formatdate)
     return df
@@ -118,6 +118,7 @@ def predict_oil_prices(future_days, past_days, date):
     omsk_data    = read_weather_data("omsk_weather.csv")
     AAL_data     = read_AAL_csv("AAL.csv") 
     WTI_data     = pd.read_csv("DCOILWTICO.csv")
+    us_econ_data = get_economic_data()
 
     #gold_data1   = read_gold_data_csv("gold_current.csv")
     #gold_data2   = read_gold_data_csv("gold_previous.csv")
@@ -136,6 +137,7 @@ def predict_oil_prices(future_days, past_days, date):
     merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='left')
     #merged_weather = pd.merge(merged_weather, gold_data, on='yyyymmdd', how='left')
     merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='left')
+    #merged_weather = pd.merge(dates_df, us_econ_data, on='yyyymmdd', how='left')
 
     # STEP 3 - flatten the data based on past_days
 
@@ -180,32 +182,40 @@ def predict_oil_prices(future_days, past_days, date):
             date_cols_to_drop.append(label_to_drop)
     merged_data.drop(date_cols_to_drop, axis=1, inplace=True)
     # Replace NaN with mean
-    merged_data.fillna(merged_data.mean()['houston_temperature_1':'DCOILWTICO'], inplace=True)
+    merged_data.fillna(merged_data.mean()[:], inplace=True)
     merged_data = merged_data.round(2)
     merged_data = merged_data.stack().apply(pd.to_numeric, errors='ignore').fillna(0).unstack()
     merged_data.to_csv("merged_data.csv", sep=',')
 
     # STEP # - Split data to train and test data frames
+    train_size = int(len(merged_data) * 0.8)
+    test_size = len(merged_data) - train_size
 
-    train, test = train_test_split(merged_data, test_size=0.2)
+    print("train_size = {} test_size = {}".format(train_size, test_size))
 
-    print("Training observations: %d" % len(train))
-    print("Testing observations: %d" % len(test))
+    train, test = merged_data[0:train_size], merged_data[train_size:]
 
-    train_x, train_y = train.iloc[:,2:-1], train.iloc[:, -1]
-    test_x, test_y = test.iloc[:,2:-1], test.iloc[:, -1]
+    train_x, train_y = train.iloc[:,2:-1], train.iloc[:,-1]
+    test_x, test_y = test.iloc[:,2:-1], test.iloc[:,-1]
 
+    # STEP # - Trainig and testing
     rf = RandomForestRegressor(n_estimators=100)
     rf.fit(train_x, train_y)
-    test['PredWTI'] = rf.predict(test_x)
+    predicted = rf.predict(test_x)
+    test.loc[:,'PredWTI'] = predicted
 
+    # STEP # - Report results
     print("Mean Absolute Error:", mean_absolute_error(test_y, test['PredWTI']))
     print("Mean Squared Error:", mean_squared_error(test_y, test['PredWTI']))
-    r2=r2_score(test_y, test['PredWTI'])
+    r2=r2_score(test_y.values, test['PredWTI'].values)
     print("R squared:", r2)
+    test.loc[:,'diff'] = (1 - abs(test['DCOILWTICO'].values - test['PredWTI'].values)/test['DCOILWTICO'].values)
+    avg = test['diff'].mean()
+    print("Accuracy:", avg)
 
     test.sort_values(by=['yyyymmdd_0'], inplace=True)
-    test['DCOILWTICO'].plot(figsize=(16,12))
-    test['PredWTI'].plot(figsize=(16,12))
+    #test['DCOILWTICO'].plot(figsize=(16,12))
+    #test['PredWTI'].plot(figsize=(16,12))
     #pl.show()
-    return r2
+
+    return r2, avg, test

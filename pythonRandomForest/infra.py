@@ -133,37 +133,38 @@ def predict_oil_prices(future_days, past_days, date):
 
     # Merge the data for three cities and keep the union of the dates
     merged_weather = pd.merge(dates_df, houston_data, on='yyyymmdd', how='left')
-    merged_weather = pd.merge(merged_weather, dhahran_data, on='yyyymmdd', how='left')
-    merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='left')
+    #merged_weather = pd.merge(merged_weather, dhahran_data, on='yyyymmdd', how='left')
+    #merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='left')
     #merged_weather = pd.merge(merged_weather, gold_data, on='yyyymmdd', how='left')
-    merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='left')
+    #merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='left')
     #merged_weather = pd.merge(dates_df, us_econ_data, on='yyyymmdd', how='left')
 
     # STEP 3 - flatten the data based on past_days
 
     index_column = []
     count = 0
-    for i in range(0, len(merged_weather)):
-        if i % past_days == 0:
-            count = count + 1
-        index_column.append(count)
+    #for i in range(0, len(merged_weather)):
+    #    if i % past_days == 0:
+    #        count = count + 1
+    #    index_column.append(count)
 
-    merged_weather = merged_weather.assign(index=index_column)
-    merged_weather = merged_weather.set_index(['index']).groupby(level=['index'])
-
+    #merged_weather = merged_weather.assign(index=index_column)
+    #merged_weather = merged_weather.set_index(['index']).groupby(level=['index'])
+    merged_weather_copy = merged_weather.copy(True)
+    
+    
     flat_merged = pd.DataFrame()
-    for details, data in merged_weather:
-        data_point = pd.concat([row for i, row in data.iterrows()]).to_frame()
+    for i in range(0, len(merged_weather)):
+        data_point = pd.concat([row for j, row in merged_weather.iloc[i:i+past_days,:].iterrows()]).to_frame()
         data_point.index = ['{}_{}'.format(label, i) for i, label in enumerate(data_point.index)]
         flat_merged = pd.concat([flat_merged, data_point], axis=1)
-    flat_merged = flat_merged.transpose().reset_index()
+    flat_merged = flat_merged.transpose()
 
 
     #with open('golddata.csv', 'w') as f:
     #    gold_data.to_csv(f, line_terminator='\n', index=False, header=True)
-    with open('filelocation.csv', 'wb') as f:
-        flat_merged.to_csv(f, line_terminator='\n', index=False, header=True)
-
+    #with open('filelocation.csv', 'wb') as f:
+    #    flat_merged.to_csv(f, line_terminator='\n', index=False, header=True)
     merged_weather = flat_merged
 
     # STEP 4 - format WTI prices to merge with the rest
@@ -182,10 +183,13 @@ def predict_oil_prices(future_days, past_days, date):
             date_cols_to_drop.append(label_to_drop)
     merged_data.drop(date_cols_to_drop, axis=1, inplace=True)
     # Replace NaN with mean
-    merged_data.fillna(merged_data.mean()[:], inplace=True)
+    merged_data.fillna(method='ffill', inplace=True)
     merged_data = merged_data.round(2)
+
+	#if a column is entirely empty, fill with zeros
     merged_data = merged_data.stack().apply(pd.to_numeric, errors='ignore').fillna(0).unstack()
-    merged_data.to_csv("merged_data.csv", sep=',')
+
+    #merged_data.to_csv("merged_data.csv", sep=',')
 
     # STEP # - Split data to train and test data frames
     train_size = int(len(merged_data) * 0.8)

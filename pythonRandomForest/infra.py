@@ -118,6 +118,8 @@ def predict_oil_prices(future_days, past_days, date):
     omsk_data    = read_weather_data("omsk_weather.csv")
     AAL_data     = read_AAL_csv("AAL.csv") 
     WTI_data     = pd.read_csv("DCOILWTICO.csv")
+    # Add a column for percentage change
+    WTI_data['percentage'] = WTI_data.DCOILWTICO.pct_change()
     us_econ_data = get_economic_data()
 
     #gold_data1   = read_gold_data_csv("gold_current.csv")

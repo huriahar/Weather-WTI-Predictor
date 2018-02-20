@@ -142,18 +142,6 @@ def predict_oil_prices(future_days, past_days, date):
     #merged_weather = pd.merge(dates_df, us_econ_data, on='yyyymmdd', how='left')
 
     # STEP 3 - flatten the data based on past_days
-
-    index_column = []
-    count = 0
-    #for i in range(0, len(merged_weather)):
-    #    if i % past_days == 0:
-    #        count = count + 1
-    #    index_column.append(count)
-
-    #merged_weather = merged_weather.assign(index=index_column)
-    #merged_weather = merged_weather.set_index(['index']).groupby(level=['index'])
-    merged_weather_copy = merged_weather.copy(True)
-    
     
     flat_merged = pd.DataFrame()
     for i in range(0, len(merged_weather)):

@@ -66,8 +66,8 @@ def plot_params(params, test):
     pl.show()
 
 def testParams():
-    fValues = [7, 14, 21]
-    pValues = [7, 21, 30] #, 270, 300, 365]
+    fValues = [21]#[7, 14, 21]
+    pValues = [60]#[21, 60, 30] 
     max_rsquared = -99999999
     max_avg = 0
     params = {}
@@ -85,7 +85,7 @@ def testParams():
                 max_results = results
                 max_avg = avg
     print "MAX rsquared = {} accuracy = {} with params {}".format(max_rsquared, max_avg, max_params)
-    plot_params(params, results)
+    plot_params(params, max_results)
 
 def main():
     testParams()

@@ -119,7 +119,6 @@ def predict_oil_prices(future_days, past_days, date):
     AAL_data     = read_AAL_csv("AAL.csv") 
     WTI_data     = pd.read_csv("DCOILWTICO.csv")
     # Add a column for percentage change
-    WTI_data['percentage'] = WTI_data.DCOILWTICO.pct_change()
     us_econ_data = get_economic_data()
 
     #gold_data1   = read_gold_data_csv("gold_current.csv")
@@ -135,10 +134,10 @@ def predict_oil_prices(future_days, past_days, date):
 
     # Merge the data for three cities and keep the union of the dates
     merged_weather = pd.merge(dates_df, houston_data, on='yyyymmdd', how='left')
-    #merged_weather = pd.merge(merged_weather, dhahran_data, on='yyyymmdd', how='left')
-    #merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='left')
+    merged_weather = pd.merge(merged_weather, dhahran_data, on='yyyymmdd', how='left')
+    merged_weather = pd.merge(merged_weather, omsk_data, on='yyyymmdd', how='left')
     #merged_weather = pd.merge(merged_weather, gold_data, on='yyyymmdd', how='left')
-    #merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='left')
+    merged_weather = pd.merge(merged_weather, AAL_data, on='yyyymmdd', how='left')
     #merged_weather = pd.merge(dates_df, us_econ_data, on='yyyymmdd', how='left')
 
     # STEP 3 - flatten the data based on past_days
@@ -173,13 +172,15 @@ def predict_oil_prices(future_days, past_days, date):
             date_cols_to_drop.append(label_to_drop)
     merged_data.drop(date_cols_to_drop, axis=1, inplace=True)
     # Replace NaN with mean
-    merged_data.fillna(method='ffill', inplace=True)
     merged_data = merged_data.round(2)
+    merged_data['percentage'] = merged_data.DCOILWTICO.pct_change()
+    merged_data.fillna(method='ffill', inplace=True)
 
 	#if a column is entirely empty, fill with zeros
     merged_data = merged_data.stack().apply(pd.to_numeric, errors='ignore').fillna(0).unstack()
+    merged_data = merged_data.fillna(0)
 
-    #merged_data.to_csv("merged_data.csv", sep=',')
+    merged_data.to_csv("merged_data.csv", sep=',')
 
     # STEP # - Split data to train and test data frames
     train_size = int(len(merged_data) * 0.8)
@@ -189,8 +190,12 @@ def predict_oil_prices(future_days, past_days, date):
 
     train, test = merged_data[0:train_size], merged_data[train_size:]
 
-    train_x, train_y = train.iloc[:,2:-1], train.iloc[:,-1]
-    test_x, test_y = test.iloc[:,2:-1], test.iloc[:,-1]
+    #train_x, train_y = train.iloc[:,1:-3], train.iloc[:,-1]
+    #test_x, test_y = test.iloc[:,1:-3], test.iloc[:,-1]
+    
+    train_x, train_y = train.iloc[:,1:-3], train.iloc[:,-2]
+    test_x, test_y = test.iloc[:,1:-3], test.iloc[:,-2]
+
 
     # STEP # - Trainig and testing
     rf = RandomForestRegressor(n_estimators=100)
@@ -203,12 +208,20 @@ def predict_oil_prices(future_days, past_days, date):
     print("Mean Squared Error:", mean_squared_error(test_y, test['PredWTI']))
     r2=r2_score(test_y.values, test['PredWTI'].values)
     print("R squared:", r2)
+    #test.loc[:,'diff'] = (1 - abs(test['percentage'].values - test['PredWTI'].values)/test['percentage'].values)
     test.loc[:,'diff'] = (1 - abs(test['DCOILWTICO'].values - test['PredWTI'].values)/test['DCOILWTICO'].values)
     avg = test['diff'].mean()
     print("Accuracy:", avg)
 
+    test['accuracy_within_range'] = test.apply(lambda x: 1 if abs((x['DCOILWTICO'] - x['PredWTI'])/x['DCOILWTICO']) < 0.1 else 0, axis=1)
+    test.to_csv("test.csv", sep=',')
+    correct_accuracy = (test['accuracy_within_range'] == 1).sum()
+    
+    accuracy = float(correct_accuracy)/len(test['accuracy_within_range'])
+    print("correct_accuracy", correct_accuracy)
+    print("accuracy", accuracy)
     test.sort_values(by=['yyyymmdd_0'], inplace=True)
-    #test['DCOILWTICO'].plot(figsize=(16,12))
+    #test['percentage'].plot(figsize=(16,12))
     #test['PredWTI'].plot(figsize=(16,12))
     #pl.show()
 

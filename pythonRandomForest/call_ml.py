@@ -19,15 +19,19 @@ def plot_params(predicted, actual):
     pl.show()
 
 def testParams():
-    fValues = [7]#[7, 14, 21]
-    pValues = [4]#[21, 60, 30] 
+    fValues = [7, 1]#[7, 14, 21]
+    pValues = [28, 35] 
     numTestPoints = 100
     trainingDays = 365
     max_day = datetime.date(year = MAX_YEAR, month = 12, day = 31)
-    allPredicted = []
-    allActual = []
+    best_r2 = -999
+    bestAccuracy = -99
+    bestPredicted = []
+    bestActual = []
     for f in fValues:
         for p in pValues:
+            allPredicted = []
+            allActual = []
             for t in range(0, numTestPoints):
                 start_date = datetime.date( year = MIN_YEAR, month = 1, day = 1 )
                 start_date = start_date + datetime.timedelta(days=(t))
@@ -48,12 +52,24 @@ def testParams():
                 print "acutal = {}, predicted = {}".format(actual, predicted)
                 allPredicted.append(predicted)
                 allActual.append(actual)
-    r2=r2_score(allActual, allPredicted)
-    print "R2 = {}".format(r2)    
-    acc = [1 if (abs(a-b)/a) < 0.03 else 0 for (a,b) in zip(allActual, allPredicted)]
-    acc = sum(acc) / len(acc)
-    print "Accuracy = {}".format(acc)    
-    plot_params(allPredicted, allActual)
+            r2=r2_score(allActual, allPredicted)
+            print "R2 = {}".format(r2)    
+            acc = [1 if (abs(a-b)/a) < 0.1 else 0 for (a,b) in zip(allActual, allPredicted)]
+            acc = sum(acc) / len(acc)
+            print "Accuracy = {}".format(acc)    
+            if r2 > best_r2:
+                best_r2 = r2
+                bestPredicted = allPredicted
+                bestActual = allActual
+                bestAccuracy = acc
+                bestParams = [f, p]
+                
+    print "==================================================="
+    print "==================================================="
+    print "==================================================="
+    print "Best Parameters are: f = {} p = {}".format(bestParams[0], bestParams[1])
+    print "r2 = {} Accuracy = {}".format(best_r2, bestAccuracy)
+    plot_params(bestPredicted, bestActual)
 
 def main():
     testParams()

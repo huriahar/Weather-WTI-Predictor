@@ -1,5 +1,4 @@
-<body>	
-
+	<br /><br /><br /><br /> <br /> <br />
 	<nav class="navbar fixed-bottom navbar-dark bg-dark">
 		<div class="navbar-header">
 			<a class="navbar-text" href="/">Developed by ... </a>

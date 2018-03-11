@@ -1,7 +1,9 @@
-<div class="container h-100">
-	<div class="row align-items-center h-100">
-		<div class="col-3 mx-auto" align="center">
+<div class="container" align="center">
+	<div class="row">
+		<div class="col">
+		</div>
 
+		<div class="col">
 			<form action="/results" method="post" id="getinput">
 
 				<div class="form-group">
@@ -16,7 +18,10 @@
 				<button type="submit" class="btn btn-success">Submit</button>
 
 			</form>
+		</div>
 
+		<div class="col">
 		</div>
 	</div>
 </div>
+

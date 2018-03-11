@@ -7,8 +7,8 @@ from bottle import *
 @route('/')
 def search_form():
 
-	main_homepage = template('index.tpl') 
-	return main_homepage
+	homepage = template('header.tpl') + template('form.tpl') + template('footer.tpl') 
+	return homepage
 
 
 @route('/results', method='POST')
@@ -17,8 +17,6 @@ def getresults():
 	future = request.forms.get('future')
 
 	# TO DO ::: Need to add validation on the form! 
-
-
 	if past == '' or future == '':
 		redirect('/')
 	else:
@@ -27,10 +25,14 @@ def getresults():
 
 @route('/faq')
 def faq():
-	return '''<p>STILL WORKING ON IT</p>'''
+
+	faq = template('header.tpl') + template('faq.tpl') + template('footer.tpl')
+	return faq
 
 @route('/about')
-def faq():
-	return '''<p>STILL WORKING ON IT</p>'''
+def about():
+
+	about = template('header.tpl') + template('about.tpl') + template('footer.tpl')
+	return about
 
 run(host="localhost", port=8080, debug=True)

@@ -19,10 +19,10 @@ def plot_params(predicted, actual):
     pl.show()
 
 def testParams():
-    fValues = [7, 1]#[7, 14, 21]
-    pValues = [28, 35] 
+    fValues = [90]#[7, 14, 21]
+    pValues = [80] 
     numTestPoints = 100
-    trainingDays = 365
+    trainingDays = 356
     max_day = datetime.date(year = MAX_YEAR, month = 12, day = 31)
     best_r2 = -999
     bestAccuracy = -99
@@ -35,20 +35,23 @@ def testParams():
             for t in range(0, numTestPoints):
                 start_date = datetime.date( year = MIN_YEAR, month = 1, day = 1 )
                 start_date = start_date + datetime.timedelta(days=(t))
-                end_date = start_date + datetime.timedelta(days=(trainingDays + 1))
-                test_date = end_date + datetime.timedelta(days=(f))
+                end_date = start_date + datetime.timedelta(days=(trainingDays))
+                test_end_date = end_date + datetime.timedelta(days=(f))
+                test_date = test_end_date + datetime.timedelta(days=(1-p))
                 if end_date > max_day: break;
                 s = date_time_to_str(start_date)
                 d = date_time_to_str(end_date)
                 print "==================================================="
                 print "Test point #{}".format(t)
-                print "Start training on {}".format(s)
-                print "End training on {}".format(d)
+                print "Start training on_________: {}".format(s)
+                print "End training on___________: {}".format(d)
+                print "Test input begins on day__: {}".format(date_time_to_str(test_date))
+                print "Test input ends on day____: {}".format(date_time_to_str(test_end_date))
+                print "Today_____________________: {}".format(date_time_to_str(test_end_date))
                 print "Training days = {}".format(trainingDays)
                 print "Future offset (f) = {} Past days per data point (p) = {}".format(f,p)
-                print "Test day = {}".format(date_time_to_str(test_date))
                 print "---------------------------------------------------"
-                predicted, actual = predict_oil_prices(start_date, f, p, end_date)
+                predicted, actual = predict_oil_prices(start_date, f, p, end_date, test_date)
                 print "acutal = {}, predicted = {}".format(actual, predicted)
                 allPredicted.append(predicted)
                 allActual.append(actual)

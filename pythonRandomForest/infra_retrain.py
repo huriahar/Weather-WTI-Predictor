@@ -4,6 +4,7 @@ import pylab as pl
 import datetime
 
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.cross_validation import train_test_split
 import pudb
 

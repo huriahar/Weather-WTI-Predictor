@@ -8,21 +8,28 @@ from common import date_time_to_str
 from common import get_date_range
 
 ######### DEFINE THE SOLUTION SPACE ############
-MIN_YEAR = 2007
+MIN_YEAR = 2015
 MAX_YEAR = 2017
-################################################
+###############################################
 
-def plot_params(predicted, actual):
+def plot_params(params, predicted, actual, r2, acc):
     idx = [i for i in range(0, len(predicted))]
-    pl.plot(idx, predicted, 'r')
-    pl.plot(idx, actual, 'b')
-    pl.show()
+    pl.figure(figsize=(25,10))
+    pl.plot(idx, predicted, 'r', label = "Predicted")
+    pl.plot(idx, actual, 'b', label = "Actual")
+    pl.legend(shadow=True)
+    pl.xlabel("Date")
+    pl.ylabel("WTI Crude Oil Price (USD)")
+    pl.title("Prediction using P = {}, F = {}, Y = {}".format(params[1], params[0], MIN_YEAR) )
+    pl.figtext(0.92, 0.5, "R-squared : {}\nAccuracy : {}".format(r2, acc))
+    pl.savefig("../Frontend/img/{},{},{}.png".format(params[1], params[0], MIN_YEAR), dpi = 100)
+    # pl.show()
 
 def testParams():
-    fValues = [90]#[7, 14, 21]
-    pValues = [80] 
+    fValues = [7]
+    pValues = [30]
     numTestPoints = 100
-    trainingDays = 356
+    trainingDays = 365
     max_day = datetime.date(year = MAX_YEAR, month = 12, day = 31)
     best_r2 = -999
     bestAccuracy = -99
@@ -52,13 +59,13 @@ def testParams():
                 print "Future offset (f) = {} Past days per data point (p) = {}".format(f,p)
                 print "---------------------------------------------------"
                 predicted, actual = predict_oil_prices(start_date, f, p, end_date, test_date)
-                print "acutal = {}, predicted = {}".format(actual, predicted)
+                print "actual = {}, predicted = {}".format(actual, predicted)
                 allPredicted.append(predicted)
                 allActual.append(actual)
             r2=r2_score(allActual, allPredicted)
             print "R2 = {}".format(r2)    
-            acc = [1 if (abs(a-b)/a) < 0.1 else 0 for (a,b) in zip(allActual, allPredicted)]
-            acc = sum(acc) / len(acc)
+            acc = [1 if (abs(a-b)/a) < 0.03 else 0 for (a,b) in zip(allActual, allPredicted)]
+            acc = sum(acc)/float(len(acc))
             print "Accuracy = {}".format(acc)    
             if r2 > best_r2:
                 best_r2 = r2
@@ -72,7 +79,7 @@ def testParams():
     print "==================================================="
     print "Best Parameters are: f = {} p = {}".format(bestParams[0], bestParams[1])
     print "r2 = {} Accuracy = {}".format(best_r2, bestAccuracy)
-    plot_params(bestPredicted, bestActual)
+    plot_params(bestParams, bestPredicted, bestActual, round(best_r2,2), round(bestAccuracy,2))
 
 def main():
     testParams()

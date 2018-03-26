@@ -14,9 +14,17 @@
 		<div class="navbar-header">
 			<a class="navbar-brand" href="/">WebSiteName</a>
 		</div>
-		<div class="navbar-nav ml-auto" >
-			<a class="nav-link" href="/about">About Us</a>
-		</div>
+		<ul class="nav navbar-nav navbar-right">
+			<li class="nav-item">
+				<a class="nav-link" href="/about">About Us</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/faq">F.A.Q</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/sample">Sample Results</a>
+			</li>
+		</ul>  
 	</nav> <br /> <br />
 </body>
 </html>

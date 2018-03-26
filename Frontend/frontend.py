@@ -1,13 +1,13 @@
 from bottle import *
 
-# @route('/static/<filename:path>')
-# def get_css(filename):
-# 	return static_file(filename, root='./')
+@route('/static/<filename:path>')
+def get_css(filename):
+	return static_file(filename, root='./static/img/')
 
 @route('/')
 def search_form():
 
-	homepage = template('header.tpl') + template('form.tpl') + template('footer.tpl') 
+	homepage = template('header.tpl') + template('form.tpl')
 	return homepage
 
 
@@ -26,13 +26,19 @@ def getresults():
 @route('/faq')
 def faq():
 
-	faq = template('header.tpl') + template('faq.tpl') + template('footer.tpl')
+	faq = template('header.tpl') + template('faq.tpl')
 	return faq
 
 @route('/about')
 def about():
 
-	about = template('header.tpl') + template('about.tpl') + template('footer.tpl')
+	about = template('header.tpl') + template('about.tpl')
 	return about
+
+
+@route('/sample')
+def sampleresults():
+	test = template('header.tpl') + template('sampleresults.tpl')
+	return test
 
 run(host="localhost", port=8080, debug=True)

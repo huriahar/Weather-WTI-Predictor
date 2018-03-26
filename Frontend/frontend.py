@@ -2,7 +2,7 @@ from bottle import *
 
 @route('/static/<filename:path>')
 def get_css(filename):
-	return static_file(filename, root='./static/img/')
+	return static_file(filename, root='./')
 
 @route('/')
 def search_form():
@@ -15,13 +15,15 @@ def search_form():
 def getresults():
 	past = request.forms.get('past')
 	future = request.forms.get('future')
+	year = request.forms.get('year')
+
+	image = '''<img src="/static/img/{},{},{}.png" >'''.format(str(past), str(future), str(year))
 
 	# TO DO ::: Need to add validation on the form! 
-	if past == '' or future == '':
+	if past == '' or future == '' or year == '':
 		redirect('/')
 	else:
-		return '''<p> STILL WORKING ON RESULTS PAGE</p>'''
-
+		return template('header.tpl') + image
 
 @route('/faq')
 def faq():
@@ -35,10 +37,5 @@ def about():
 	about = template('header.tpl') + template('about.tpl')
 	return about
 
-
-@route('/sample')
-def sampleresults():
-	test = template('header.tpl') + template('sampleresults.tpl')
-	return test
 
 run(host="localhost", port=8080, debug=True)

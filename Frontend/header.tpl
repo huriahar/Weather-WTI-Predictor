@@ -7,7 +7,6 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
 
-    <!-- <link rel="stylesheet" type="text/css" href="/static/index.css"> -->
 </head>
 <body>	
 	<nav class="navbar navbar-dark bg-dark">
@@ -20,9 +19,6 @@
 			</li>
 			<li class="nav-item">
 				<a class="nav-link" href="/faq">F.A.Q</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="/sample">Sample Results</a>
 			</li>
 		</ul>  
 	</nav> <br /> <br />

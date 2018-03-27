@@ -17,7 +17,7 @@ def getresults():
 	future = request.forms.get('future')
 	year = request.forms.get('year')
 
-	image = '''<img src="/static/img/{},{},{}.png" >'''.format(str(past), str(future), str(year))
+	image = '''<img src="/static/img/{},{},{}.png">'''.format(str(past), str(future), str(year))
 
 	# TO DO ::: Need to add validation on the form! 
 	if past == '' or future == '' or year == '':
@@ -31,11 +31,11 @@ def faq():
 	faq = template('header.tpl') + template('faq.tpl')
 	return faq
 
-@route('/about')
-def about():
+# @route('/about')
+# def about():
 
-	about = template('header.tpl') + template('about.tpl')
-	return about
+# 	about = template('header.tpl') + template('about.tpl')
+# 	return about
 
 
 run(host="localhost", port=8080, debug=True)

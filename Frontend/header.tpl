@@ -12,7 +12,7 @@
 <body>	
 	<nav class="navbar navbar-dark bg-dark">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="/">Crude Oil Prediction</a>
+			<a class="navbar-brand" href="/">WTI Forecast</a>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
 <!-- 			<li class="nav-item">

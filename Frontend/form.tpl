@@ -1,12 +1,11 @@
 <div class="container" align="center">
 	<div class="jumbotron">
-		<h1 style="font-size: 400%;">OIL FORECASTING TOOL</h1>
+		<h1 style="font-size: 400%;">WTI CRUDE OIL FORECASTING TOOL</h1>
 	</div>
 </div>
 
-
 <div class="container">
-	<form action="/results" method="post" id="getinput">
+	<form action="/results" method="post" id="getinput" >
 		<div class="row">
 			<div class="col-sm-4">
 				<h5> YEAR : </h5>

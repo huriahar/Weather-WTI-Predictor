@@ -19,9 +19,9 @@ def getresults():
 
 	image = '''<img src="/static/img/{},{},{}.png">'''.format(str(past), str(future), str(year))
 
-	# TO DO ::: Need to add validation on the form! 
+	###### TO DO ::: Need to add validation on the form! 
 	if past == '' or future == '' or year == '':
-		redirect('/')
+		return template('header.tpl') + template('form.tpl')
 	else:
 		return template('header.tpl') + image
 

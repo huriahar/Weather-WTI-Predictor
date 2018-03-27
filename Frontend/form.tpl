@@ -1,17 +1,26 @@
 <div class="container" align="center">
 	<div class="jumbotron">
-		<h1 style="font-size: 400%;">WTI CRUDE OIL FORECASTING TOOL</h1>
+		<h1 style="font-size: 400%;">WTI CRUDEOIL FORECASTING TOOL</h1>
 	</div>
 </div>
+
+
 
 <div class="container">
 	<form action="/results" method="post" id="getinput" >
 		<div class="row">
 			<div class="col-sm-4">
-				<h5> YEAR : </h5>
+				<h5>
+					<label for="myslider" id="mylabel">YEAR: 2007</label>
+				</h5>
 			</div>
 			<div class="col-sm-8">
-				<div class="form-check form-check-inline">
+				<div class="slider">
+				    <input type="range" class="slider" id="myslider" min="2007" max="2015" value="2007" name="year"/>
+				</div>
+
+
+<!-- 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="year" id="year07" value="2007">
 				  <label class="form-check-label" for="year07">2007</label>
 				</div>
@@ -46,7 +55,9 @@
 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="year" id="year15" value="2015">
 				  <label class="form-check-label" for="year15">2015</label>
-				</div>
+				</div> -->
+
+
 			</div>
 		</div>
 

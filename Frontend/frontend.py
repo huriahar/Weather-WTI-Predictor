@@ -11,7 +11,7 @@ def search_form():
 	return homepage
 
 
-@route('/results', method='POST')
+@route('/', method='POST')
 def getresults():
 	past = request.forms.get('past')
 	future = request.forms.get('future')
@@ -23,7 +23,7 @@ def getresults():
 	if past == '' or future == '' or year == '':
 		return template('header.tpl') + template('form.tpl')
 	else:
-		return template('header.tpl') + image
+		return template('header.tpl') + template('form.tpl') + image
 
 @route('/faq')
 def faq():

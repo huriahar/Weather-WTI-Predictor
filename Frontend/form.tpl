@@ -7,7 +7,7 @@
 
 
 <div class="container">
-	<form action="/results" method="post" id="getinput" >
+	<form action="/" method="post" id="getinput" >
 		<div class="row">
 			<div class="col-sm-4">
 				<h5>

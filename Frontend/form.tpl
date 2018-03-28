@@ -30,7 +30,7 @@
 			</div>
 			<div class="col-sm-8">
 				<div class="slider">
-				    <input type="range" class="slider" id="sliderfuture" value="1" min="1" max="6" step="1" name="future"/>
+				    <input type="range" class="slider" id="sliderfuture" value="1" min="1" max="6" step="1" name="future" />
 				</div>
 			</div>
 		</div>
@@ -44,7 +44,7 @@
 			</div>
 			<div class="col-sm-8">
 				<div class="slider">
-				    <input type="range" class="slider" id="sliderpast" value="1" min="1" max="5" step="1" name="past" />
+				    <input type="range" class="slider" id="sliderpast" value="1" min="1" max="5" step="1" name="past"  />
 				</div>			
 			</div>
 		</div>

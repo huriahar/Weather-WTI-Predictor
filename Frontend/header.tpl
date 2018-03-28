@@ -44,8 +44,6 @@
 				else{value="60"}
 				LabelPast.innerHTML = "PAST DAYS: " + value;
 			}
-
-
 		}
 	</script>
 

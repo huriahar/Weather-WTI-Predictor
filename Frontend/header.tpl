@@ -13,12 +13,39 @@
 	<script type="text/javascript">
 		window.onload=function(){
 			
-			var mySlider = document.getElementById('myslider');
-			var myLabel = document.getElementById('mylabel');
+			var SliderYear = document.getElementById('slideryear');
+			var LabelYear = document.getElementById('labelyear');
 
-			mySlider.oninput = function() {
-				myLabel.innerHTML = "YEAR: " + this.value;
+			SliderYear.oninput = function() {
+				LabelYear.innerHTML = "YEAR: " + this.value;
 			}
+
+			var SliderFuture = document.getElementById('sliderfuture');
+			var LabelFuture = document.getElementById('labelfuture');
+
+			SliderFuture.oninput = function() {
+				if (this.value == "1"){value = "1"}
+				else if (this.value == "2"){value="7"}
+				else if (this.value == "3"){value="14"}
+				else if (this.value == "4"){value="30"}
+				else if (this.value == "5"){value="60"}
+				else{value="90"}
+				LabelFuture.innerHTML = "FUTURE DAY: " + value;
+			}
+
+			var SliderPast = document.getElementById('sliderpast');
+			var LabelPast = document.getElementById('labelpast');
+
+			SliderPast.oninput = function() {
+				if (this.value == "1"){value = "5"}
+				else if (this.value == "2"){value="7"}
+				else if (this.value == "3"){value="14"}
+				else if (this.value == "4"){value="30"}
+				else{value="60"}
+				LabelPast.innerHTML = "PAST DAYS: " + value;
+			}
+
+
 		}
 	</script>
 

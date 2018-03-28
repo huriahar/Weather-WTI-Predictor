@@ -11,15 +11,58 @@
 		<div class="row">
 			<div class="col-sm-4">
 				<h5>
-					<label for="myslider" id="mylabel">YEAR: 2007</label>
+					<label for="slideryear" id="labelyear"> YEAR: 2007</label>
 				</h5>
 			</div>
 			<div class="col-sm-8">
 				<div class="slider">
-				    <input type="range" class="slider" id="myslider" min="2007" max="2015" value="2007" name="year"/>
+				    <input type="range" class="slider" id="slideryear" min="2007" max="2015" value="2007" name="year"/>
 				</div>
+			</div>
+		</div>
+
+		<br >
+		<div class="row">
+			<div class="col-sm-4">
+				<h5> 
+					<label for="sliderfuture" id="labelfuture"> FUTURE DAY: 1</label>
+				</h5>
+			</div>
+			<div class="col-sm-8">
+				<div class="slider">
+				    <input type="range" class="slider" id="sliderfuture" value="1" min="1" max="6" step="1" name="future"/>
+				</div>
+			</div>
+		</div>
+
+		<br >
+		<div class="row">
+			<div class="col-sm-4">
+				<h5>
+					<label for="sliderpast" id="labelpast"> PAST DAYS: 1</label>
+				</h5>
+			</div>
+			<div class="col-sm-8">
+				<div class="slider">
+				    <input type="range" class="slider" id="sliderpast" value="1" min="1" max="5" step="1" name="past"/>
+				</div>			
+			</div>
+		</div>
+
+		<br ><br >
+		<div class="col text-center"> 
+			<button type="submit" class="btn btn-success" align="center">Submit</button>
+		</div>
+	</form>
+</div>
 
 
+
+<!-- _________________________________ Previous form _________________________________________________________ -->
+<!-- _________________________________________________________________________________________________________ -->
+<!-- _________________________________________________________________________________________________________ -->
+
+<!-- For year -->
 <!-- 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="year" id="year07" value="2007">
 				  <label class="form-check-label" for="year07">2007</label>
@@ -58,16 +101,9 @@
 				</div> -->
 
 
-			</div>
-		</div>
 
-		<br >
-		<div class="row">
-			<div class="col-sm-4">
-				<h5> FUTURE DAYS : </h5>
-			</div>
-			<div class="col-sm-8">
-				<div class="form-check form-check-inline">
+<!-- For Future -->
+				<!-- 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="future" id="future1" value="1">
 				  <label class="form-check-label" for="future1">1</label>
 				</div>
@@ -90,17 +126,10 @@
 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="future" id="future90" value="90">
 				  <label class="form-check-label" for="future90">90</label>
-				</div>
-			</div>
-		</div>
+				</div> -->
 
-		<br >
-		<div class="row">
-			<div class="col-sm-4">
-				<h5> PAST DAYS : </h5>
-			</div>
-			<div class="col-sm-8">
-				<div class="form-check form-check-inline">
+<!-- For Past -->
+<!-- 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="past" id="past5" value="5">
 				  <label class="form-check-label" for="past5">5</label>
 				</div>
@@ -119,14 +148,4 @@
 				<div class="form-check form-check-inline">
 				  <input class="form-check-input" type="radio" name="past" id="past60" value="60">
 				  <label class="form-check-label" for="past60">60</label>
-				</div>
-			</div>
-		</div>
-
-		<br ><br >
-		<div class="col text-center"> 
-			<button type="submit" class="btn btn-success" align="center">Submit</button>
-		</div>
-	</form>
-</div>
-
+				</div> -->

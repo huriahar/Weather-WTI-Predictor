@@ -13,8 +13,22 @@ def search_form():
 
 @route('/', method='POST')
 def getresults():
-	past = request.forms.get('past')
-	future = request.forms.get('future')
+	past = int(request.forms.get('past'))
+	if past == 1: past = 5
+	elif past == 2: past = 7
+	elif past == 3: past = 14
+	elif past == 4: past = 30
+	else: past = 60
+
+	future = int(request.forms.get('future'))
+	if future == 1: future = 1
+	elif future == 2: future = 7
+	elif future == 3: future = 14
+	elif future == 4: future = 30
+	elif future == 5: future = 60
+	else: future = 90
+
+
 	year = request.forms.get('year')
 
 	image = '''<img src="/static/img/{},{},{}.png">'''.format(str(past), str(future), str(year))

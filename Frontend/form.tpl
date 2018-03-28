@@ -16,7 +16,7 @@
 			</div>
 			<div class="col-sm-8">
 				<div class="slider">
-				    <input type="range" class="slider" id="slideryear" min="2007" max="2015" value="2007" name="year"/>
+				    <input type="range" class="slider" id="slideryear" min="2007" max="2015" value="2007" name="year" />
 				</div>
 			</div>
 		</div>
@@ -39,12 +39,12 @@
 		<div class="row">
 			<div class="col-sm-4">
 				<h5>
-					<label for="sliderpast" id="labelpast"> PAST DAYS: 1</label>
+					<label for="sliderpast" id="labelpast"> PAST DAYS: 5</label>
 				</h5>
 			</div>
 			<div class="col-sm-8">
 				<div class="slider">
-				    <input type="range" class="slider" id="sliderpast" value="1" min="1" max="5" step="1" name="past"/>
+				    <input type="range" class="slider" id="sliderpast" value="1" min="1" max="5" step="1" name="past" />
 				</div>			
 			</div>
 		</div>

@@ -8,26 +8,27 @@ from common import date_time_to_str
 from common import get_date_range
 
 ######### DEFINE THE SOLUTION SPACE ############
-MIN_YEAR = 2015
+MIN_YEAR = 2009
 MAX_YEAR = 2017
 ###############################################
 
 def plot_params(params, predicted, actual, r2, acc):
     idx = [i for i in range(0, len(predicted))]
     pl.figure(figsize=(25,10))
-    pl.plot(idx, predicted, 'r', label = "Predicted")
-    pl.plot(idx, actual, 'b', label = "Actual")
-    pl.legend(shadow=True)
-    pl.xlabel("Date")
-    pl.ylabel("WTI Crude Oil Price (USD)")
-    pl.title("Prediction using P = {}, F = {}, Y = {}".format(params[1], params[0], MIN_YEAR) )
-    pl.figtext(0.92, 0.5, "R-squared : {}\nAccuracy : {}".format(r2, acc))
+    pl.plot(idx, predicted, 'r', label = "Predicted", lw=7)
+    pl.plot(idx, actual, 'b', label = "Actual", lw=7)
+    pl.legend(loc = "upper right", shadow=True)
+    pl.xlabel("Date", weight = "bold", size=30)
+    pl.ylabel("WTI Crude Oil Price (USD)", weight = "bold", size=30)
+    pl.title("Prediction using P = {}, F = {}, Y = {}".format(params[1], params[0], MIN_YEAR), weight = "bold", size = 40)
+    pl.figtext(0.83, 0.5, "R-squared : {}\nAccuracy : {}".format(r2, acc), size=30)
+    pl.subplots_adjust(left=0.05, right=0.8, top=0.9, bottom=0.1)
     pl.savefig("../Frontend/img/{},{},{}.png".format(params[1], params[0], MIN_YEAR), dpi = 100)
     # pl.show()
 
 def testParams():
+    pValues = [5]
     fValues = [7]
-    pValues = [30]
     numTestPoints = 100
     trainingDays = 365
     max_day = datetime.date(year = MAX_YEAR, month = 12, day = 31)
@@ -64,7 +65,7 @@ def testParams():
                 allActual.append(actual)
             r2=r2_score(allActual, allPredicted)
             print "R2 = {}".format(r2)    
-            acc = [1 if (abs(a-b)/a) < 0.03 else 0 for (a,b) in zip(allActual, allPredicted)]
+            acc = [1 if (abs(a-b)/a) < 0.04 else 0 for (a,b) in zip(allActual, allPredicted)]
             acc = sum(acc)/float(len(acc))
             print "Accuracy = {}".format(acc)    
             if r2 > best_r2:

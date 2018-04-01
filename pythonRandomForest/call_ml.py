@@ -8,7 +8,7 @@ from common import date_time_to_str
 from common import get_date_range
 
 ######### DEFINE THE SOLUTION SPACE ############
-MIN_YEAR = 2007
+MIN_YEAR = 2008
 MAX_YEAR = 2017
 ###############################################
 
@@ -29,7 +29,7 @@ def plot_params(params, predicted, actual, r2, acc):
 def testParams():
     pValues = [14]
     fValues = [1]
-    numTestPoints = 2200
+    numTestPoints = 200
     trainingDays = 365
     max_day = datetime.date(year = MAX_YEAR, month = 12, day = 31)
     best_r2 = -999

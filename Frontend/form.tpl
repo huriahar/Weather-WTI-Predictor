@@ -1,6 +1,6 @@
 <div class="container" align="center">
 	<div class="jumbotron">
-		<h1 style="font-size: 400%;">WTI CRUDEOIL FORECASTING TOOL</h1>
+		<h1 style="font-size: 400%;">WTI CRUDE OIL FORECASTING TOOL</h1>
 	</div>
 </div>
 

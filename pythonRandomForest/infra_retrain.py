@@ -97,6 +97,7 @@ def predict_oil_prices(start_date, future_days, past_days, end_date, test_date):
 
     # STEP # - Trainig and testing
     rf = RandomForestRegressor(n_estimators=100)
+    #rf = GradientBoostingRegressor()
     rf.fit(train_x, train_y)
     predicted = rf.predict(test_x)
 

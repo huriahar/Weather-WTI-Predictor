@@ -8,7 +8,7 @@ from common import date_time_to_str
 from common import get_date_range
 
 ######### DEFINE THE SOLUTION SPACE ############
-MIN_YEAR = 2007
+MIN_YEAR = 2015
 MAX_YEAR = 2017
 ###############################################
 
